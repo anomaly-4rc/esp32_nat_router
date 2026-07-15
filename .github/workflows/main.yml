@@ -2,7 +2,6 @@ name: Cloud Build ESP32 Router
 
 on:
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,6 +13,11 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - name: Upgrade Component Manager
+        run: |
+          . /opt/esp/idf/export.sh
+          python -m pip install --upgrade idf-component-manager
+
       - name: Build Firmware
         run: |
           . /opt/esp/idf/export.sh
@@ -23,7 +27,7 @@ jobs:
           fi
           idf.py build
 
-      - name: results
+      - name: Upload Build Results to GitHub
         uses: actions/upload-artifact@v4
         with:
           name: esp32-nat-router-binaries
@@ -32,4 +36,3 @@ jobs:
             build/partition_table/partition-table.bin
             build/esp32_nat_router.bin
             build/ota_data_initial.bin
-            
