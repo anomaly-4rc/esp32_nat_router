@@ -1,0 +1,35 @@
+name: Cloud Build ESP32 Router
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: espressif/idf:release-v4.4
+
+    steps:
+      - name: Checkout Repo and Submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Build Firmware
+        run: |
+          . /opt/esp/idf/export.sh
+          # Menghindari error konfigurasi kosong
+          if [ -f sdkconfig.defaults ]; then
+            idf.py defconfig
+          fi
+          idf.py build
+
+      - name: results
+        uses: actions/upload-artifact@v4
+        with:
+          name: esp32-nat-router-binaries
+          path: |
+            build/bootloader/bootloader.bin
+            build/partition_table/partition-table.bin
+            build/esp32_nat_router.bin
+            build/ota_data_initial.bin
+            
